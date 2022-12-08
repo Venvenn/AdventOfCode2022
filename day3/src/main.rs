@@ -1,5 +1,4 @@
 use std::char;
-use std::collections::HashMap;
 use std::fs::File;
 use std::io::{prelude::*, BufReader, Lines};
 
@@ -21,18 +20,20 @@ fn main()
         line_arary[line_count] = line_string.clone();
         score1 += parse_line(line_string);
 
+        print!("LineCount = {} \n", line_count);
 
         line_count+=1;
 
-        if(line_count >= 3)
+        if line_count >= 3
         {
             line_count = 0;
             score2 += get_score_of_unique(&line_arary);
+            line_arary = Default::default();
         }
     }
 
-    print!("Part1 Score = {}", score1);
-    print!("Part2 Score = {}", score2);
+    print!("Part1 Score = {} \n", score1);
+    print!("Part2 Score = {} \n", score2);
 }
 
 fn load_file(file_path: &str) -> Lines<BufReader<File>>
@@ -56,37 +57,28 @@ fn parse_line(line: String) -> u32
 fn get_score_of_unique(strings: &[String]) -> u32
 {
     let string1 = &strings[0];
-    let mut char_map = HashMap::new();
+    let mut char_vec: Vec<char> = string1.chars().collect();
 
-    for c in string1.chars()
+    for string in strings[1..].iter() 
     {
-        char_map.insert(c, false);
-    }
-
-    for string in strings[..].iter() 
-    {
+        let mut new_char_vec: Vec<char> = Vec::new();
         for character in string.chars().into_iter()
         {
-            let mapCharacter = &character.clone();
-            if char_map.contains_key(mapCharacter)
+            if char_vec.contains(&character) && !new_char_vec.contains(&character)
             {
-                char_map.get_mut(&character) = true;
+                new_char_vec.push(character)
             }
         }
-
-        for mapChar in char_map
-        {
-            if mapChar.1
-            {
-                char_map.remove(&mapChar.0);
-            }
-        }
+        char_vec = new_char_vec;
     }
 
     let mut score = 0;
 
-    for char in char_map.keys()
-    {
+
+    print!("char_vec = {} \n", char_vec.len());
+
+    for char in char_vec.iter()
+    {      
         let offset: u32 = match char.is_uppercase() 
         {
             true => UPPER_OFFSET,
